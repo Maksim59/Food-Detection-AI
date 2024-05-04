@@ -1,0 +1,47 @@
+!nvidia-smi
+
+import os
+HOME = os.getcwd()
+print(HOME)
+
+!pip install ultralytics==8.0.196
+
+from IPython import display
+display.clear_output()
+
+import ultralytics
+ultralytics.checks()
+
+from ultralytics import YOLO
+
+from IPython.display import display, Image
+
+!mkdir {HOME}/datasets
+%cd {HOME}/datasets
+
+!pip install roboflow
+
+from roboflow import Roboflow
+rf = Roboflow(api_key="----------")
+project = rf.workspace("maksim-isayenka-6bugh").project("food-detection2-j56jd")
+version = project.version(1)
+dataset = version.download("yolov8")
+
+%cd {HOME}
+
+!yolo task=detect mode=train model=yolov8s.pt data={dataset.location}/data.yaml epochs=50 imgsz=800 plots=True
+
+!ls {HOME}/runs/detect/train/
+
+%cd {HOME}
+Image(filename=f'{HOME}/runs/detect/train/confusion_matrix.png', width=600)
+
+%cd {HOME}
+Image(filename=f'{HOME}/runs/detect/train/results.png', width=600)
+
+%cd {HOME}
+Image(filename=f'{HOME}/runs/detect/train/val_batch0_pred.jpg', width=600)
+
+
+
+
